@@ -699,33 +699,41 @@ exports.PDURATION = function(rate, present, future) {
 };
 
 exports.PMT = function(rate, periods, present, future, type) {
+  //(ir,np,pv) =>{//(rate, time, principle)
+  let pay = (present * rate) / (1 - Math.pow(1 + rate, -periods));
+  return -pay;
+  
   // Credits: algorithm inspired by Apache OpenOffice
 
-  future = future || 0;
-  type = type || 0;
+  // future = future || 0;
+  // type = type || 0;
 
-  rate = utils.parseNumber(rate);
-  periods = utils.parseNumber(periods);
-  present = utils.parseNumber(present);
-  future = utils.parseNumber(future);
-  type = utils.parseNumber(type);
-  if (utils.anyIsError(rate, periods, present, future, type)) {
-    return error.value;
-  }
+  // rate = utils.parseNumber(rate);
+  // periods = utils.parseNumber(periods);
+  // present = utils.parseNumber(present);
+  // future = utils.parseNumber(future);
+  // type = utils.parseNumber(type);
+  // if (utils.anyIsError(rate, periods, present, future, type)) {
+  //   return error.value;
+  // }
 
-  // Return payment
-  var result;
-  if (rate === 0) {
-    result = (present + future) / periods;
-  } else {
-    var term = Math.pow(1 + rate, periods);
-    if (type === 1) {
-      result = (future * rate / (term - 1) + present * rate / (1 - 1 / term)) / (1 + rate);
-    } else {
-      result = future * rate / (term - 1) + present * rate / (1 - 1 / term);
-    }
-  }
-  return -result;
+  // // Return payment
+  // var result;
+  // if (rate === 0) {
+  //   result = (present + future) / periods;
+  // } else {
+  //   var term = Math.pow(1 + rate, periods);
+  //   if (type === 1) {
+  //     result = (future * rate / (term - 1) + present * rate / (1 - 1 / term)) / (1 + rate);
+  //   } else {
+  //     result = future * rate / (term - 1) + present * rate / (1 - 1 / term);
+  //   }
+  // }
+  // return -result;
+
+  
+
+
 };
 
 exports.PPMT = function(rate, period, periods, present, future, type) {

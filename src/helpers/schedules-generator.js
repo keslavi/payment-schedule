@@ -1,4 +1,4 @@
-import { CUMIPMT } from './financial';
+import { CUMIPMT, CUMPRINC } from './financial';
 
   // eslint-disable-next-line
   Number.prototype.toMoney = function(decimals, decimal_sep, thousands_sep)
@@ -27,7 +27,7 @@ import { CUMIPMT } from './financial';
           http://www.quepublishing.com/articles/article.aspx?p=23230
 
           formula:
-          PMT = PV x IR / (1 â€“ (1 + IR)â€“NP)
+          PMT = PV x IR / (1 - (1 + IR) -NP)
           converted to js:
           PMT = (PV * IR) / (1 - Math.pow(1 + IR, -NP))
         */
@@ -79,8 +79,6 @@ import { CUMIPMT } from './financial';
       return s.substr(s.length-size);
   }
 
-  
-
   export const getScheduleSum=(amt,rate, range)=>{
     var m   = {amt:+(amt)}
     var p   = +(amt);
@@ -96,15 +94,10 @@ import { CUMIPMT } from './financial';
       let paymentDet=pmt(r,t,p);
       if (t>12) {
         paymentDet.payment = p12;
-        paymentDet.payment2 = (p12Tot - p)/(t-12);
+        paymentDet.payment2 = (-CUMPRINC(m.rate/100,t,m.amt,13,t,0)/(t+1-13)).toMoney();
       }
       m.schedules.push(paymentDet);
     }
     return m;
   }
 
-  //PMT(r,t1,p)
-  //=((-PMT(r,t2,p)*t2)-(-PMT(r,t2,p)*12)-(-CUMIPMT(r,t2,p,13,t2,0)))/(t2-12)
-
-  //PMT($AA88,Q$3,$A88)
-  //=((-PMT($AA88,O$3,$A88)*O$3)-(-PMT($AA88,O$3,$A88)*12)-(-CUMIPMT($AA88,O$3,$A88,13,O$3,0)))/(O$3-12)
