@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 import Schedule from './Schedule';
 import './App.css';
-
+import {
+  Container
+} from 'reactstrap';
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <Schedule></Schedule>
-      </div>
+      <Container>
+        <div className="App">
+          <Schedule></Schedule>
+        </div>
+      </Container>
     );
   }
 }

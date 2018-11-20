@@ -1,6 +1,14 @@
-.App {
-  /* text-align: center; */
+@media print
+{
+    .no-print, .no-print *
+    {
+        display: none !important;
+    }
 }
+
+/* .App {
+  text-align: center;
+} */
 
 .App-logo {
   animation: App-logo-spin infinite 20s linear;

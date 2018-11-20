@@ -1,16 +1,11 @@
 import React, { Component } from 'react';
+import CurrencyFormat from 'react-currency-format';
 import { connect } from 'react-redux';
-//import { getScheduleDet } from './helpers/paymentCalculator';
-//import { Link, withRouter } from 'react-router-dom';
-//import { toast } from 'react-toastify';
-//import _ from 'lodash';
 import {
     Field,
     reduxForm,
-    //formValueSelector, 
-    getFormValues
 } from 'redux-form';
-import { getSchedule } from './store/actions/schedule-action';
+import { getSchedule, selectSchedule } from './store/actions/schedule-action';
 import _ from 'lodash';
 
 import {
@@ -18,15 +13,6 @@ import {
     select,
     currencyMask,
 } from './helpers/redux-form-helpers'
-// import {
-//     renderDate,
-//     renderDateTime,
-//     select,
-//     renderColField,
-//     readOnlyCol,
-//     readOnlySelect,
-//     currencyMask,
-// } from '../_helpers/redux-form-helpers';
 
 import {
     Button
@@ -36,7 +22,6 @@ import {
     , Col
     , Card
     , CardBody
-    , CardHeader
     , Label
 } from 'reactstrap';
 
@@ -44,106 +29,113 @@ import moment from 'moment';
 import momentLocalizer from 'react-widgets-moment';
 momentLocalizer(moment);
 
-
 class Schedule extends Component {
-    handleChange(values) {
-        console.log(values);
-    }
-
-    calculatePayment = (item) => {
-        // const { change } = this.props;
-        // const vals = this.props.formValues;
-
-        // const pmt = getScheduleDet(vals.amtLoan, vals.payments);
-
-        // change('amountToRedeem', pmt.redeem);
-        // change('financeCharge', pmt.financeCharge)
-    }
-
-    componentDidMount() {
-        // const id = this.props.idContract;
-        // this.props.getContract(id);
-    }
-
+    handleChange(values) { console.log(values); }
+    componentDidMount() { }
 
     onSubmit(values) {
+        const rates = this.props.state.schedule.lookup.rates;
+        values.rate = rates.find(x => (x.range.min <= values.amt && values.amt <= x.range.max)).key;
+
         this.props.getSchedule(values);
         //toast.success('Saved Contract');
     }
 
+    onSelect(values) {
+        const schedule = JSON.parse(JSON.stringify(this.props.state.schedule));
+        values.amt = schedule.amt;
+        values.rate = this.props.state.schedule.lookup.rates
+            .find(x => (x.range.min <= values.amt && values.amt <= x.range.max));
+
+        this.props.selectSchedule(values);
+    }
+
     renderSchedules(items) {
-        const showAll = items.length > 12;
-        // var ret= _.map(items, item=>{
-
-
-        // });   
         if (_.isEmpty(items)) {
-            return (<div>...</div>)
+            return (<div></div>)
         }
+
+        const subtext = {
+            fontSize: '60%',
+            fontStyle: 'italic'
+        }
+
+        const showAll = items.length > 12;
+        const amt = this.props.state.schedule.amt;
+        const rate = this.props.state.schedule.lookup.rates
+            .find(x => (x.range.min <= amt && amt <= x.range.max));
+
         if (!showAll) {
             return (
-                <Row>
-                    <Col xs='6'>
-                        <table id='elSchedules' className="table table-hover table-bordered table-condensed f11 table-nowrap">
-                            <thead>
-                                <tr>
-                                    <th className='text-right'>Months<br />&nbsp;</th>
-                                    <th className='text-right'>Payment<br />&nbsp;</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    items.map(x=>{
-                                        return (
-                                            <tr key={x.id}>
-                                                <td>{x.id}</td>
-                                                <td>{x.payment}</td>
-                                            </tr>
-                                        )
-                                    })
-                                }
-                                <tr>
-                                    <td className='text-right'>a</td>
-                                    <td className='text-right'>b</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </Col>
-                </Row>
+                <Card><CardBody>
+                    Interest Rate: {rate.apr} <span style={subtext}>(Annual Percentage Rate)</span>
+                    <table id='elSchedules' className="table table-hover table-condensed f11 table-nowrap">
+                        <thead>
+                            <tr>
+                                <th className='text-center'>Months<br />&nbsp;</th>
+                                <th className='text-right'>Payment<br />&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                items.map(x => {
+                                    return (
+                                        <tr key={x.id} onClick={() => this.onSelect(x)}>
+                                            <td className='text-center'>{x.id}</td>
+                                            <td className='text-right'>{x.payment}</td>
+                                        </tr>
+                                    )
+                                })
+                            }
+                        </tbody>
+                    </table>
+                    <p style={subtext}>*APR=Annual Percentage Rate</p>
+                </CardBody></Card>
             );
         }
 
         return (
-            <Row>
-                <Col xs='6'>
-                    <table id='elSchedules' className="table table-hover table-bordered table-condensed f11 table-nowrap">
-                        <thead>
-                            <tr>
-                                <th className='text-right'>Months<br />&nbsp;</th>
-                                <th className='text-right'>Payment<br />&nbsp;(First 12)</th>
-                                <th className='text-right'>Payment<br />(after 12)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                                {
-                                    items.map(x=>{
-                                        return (
-                                            <tr key={x.id}>
-                                                <td>{x.id}</td>
-                                                <td>{x.payment}</td>
-                                                <td>{x.payment2 ? x.payment2:''}</td>
-                                            </tr>
-                                        )
-                                    })
-                                }
-                                <tr>
-                                    <td className='text-right'>a</td>
-                                    <td className='text-right'>b</td>
-                                </tr>
-                            </tbody>
-                    </table>
-                </Col>
-            </Row>
+            <Card><CardBody>
+                Interest Rate: {rate.apr} <span style={subtext}>(Annual Percentage Rate)</span>
+                <table id='elSchedules' className="table table-hover table-condensed f11 table-nowrap">
+                    <thead>
+                        <tr>
+                            <th className='text-center'>Months<br />&nbsp;</th>
+                            <th className='text-right'>Payment<br />&nbsp;(First 12)</th>
+                            <th className='text-right'>Payment<br />(after 12)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            items.map(x => {
+                                return (
+                                    <tr key={x.id} onClick={() => this.onSelect(x)}>
+                                        <td className='text-center'>{x.id}</td>
+                                        <td className='text-right'>{x.payment}</td>
+                                        <td className='text-right'>{x.payment2 ? x.payment2 : ''}</td>
+                                    </tr>
+                                )
+                            })
+                        }
+                    </tbody>
+                </table>
+                <p style={subtext}>*APR=Annual Percentage Rate</p>
+            </CardBody></Card>
+        );
+    }
+
+    renderSelected(item) {
+        if (!item) return <span></span>
+        console.log(item);
+        return (
+            <Card>
+                <CardBody>
+                    <h5>Selected Plan:</h5>
+                    <br /><b>${item.amt.toMoney()}</b> borrowed at <b>{item.rate.apr}</b>
+                    <br />for <b>{item.rate.time}</b> Months, with a monthly payment
+                    <br />of <b>${item.payment}</b> per month
+                </CardBody>
+            </Card>
         );
     }
 
@@ -157,23 +149,18 @@ class Schedule extends Component {
         //const formValues = this.props.formValues;
         const item = this.props.state.schedule || this.props.state.schedules;
         const lookup = item.lookup;
+        const selected = this.props.state.schedule.selected;
 
         if (_.isEmpty(item)) return (<div>loading...1</div>);
         if (_.isEmpty(lookup)) return (<div>loading...2</div>);
 
-        // if (!item) {
-        //     return <span>loading...</span>;
-        // }
-
         return (
             <span>
-                <br />
                 <h1>Suggested Payment Guide</h1>
                 <Form
                     onSubmit={handleSubmit(this.onSubmit.bind(this))}
                 >
                     <Card>
-                        <CardHeader>Loan Information</CardHeader>
                         <CardBody>
                             <Row>
                                 <Field
@@ -182,13 +169,6 @@ class Schedule extends Component {
                                     placeholder='Amount'
                                     component={colField}
                                     {...currencyMask}
-                                />
-                                <Field
-                                    name='rate'
-                                    label='Rate'
-                                    lookup={item.lookup.rates}
-                                    component={select}
-                                    xs='3'
                                 />
                                 <Field
                                     name='range'
@@ -201,7 +181,7 @@ class Schedule extends Component {
                                     <FormGroup className='submit'>
                                         <Label>&nbsp;.</Label>
                                         <div>
-                                            <Button color='primary'>Submit</Button>
+                                            <Button color='primary no-print'>Submit</Button>
                                         </div>
                                     </FormGroup>
                                 </Col>
@@ -209,7 +189,15 @@ class Schedule extends Component {
                         </CardBody>
                     </Card>
                 </Form>
-                {this.renderSchedules(item.schedules)}
+                <br />
+                <Row>
+                    <Col xs='6'>
+                        {this.renderSchedules(item.schedules)}
+                    </Col>
+                    <Col xs='6'>
+                        {this.renderSelected(selected)}
+                    </Col>
+                </Row>
             </span>
         )
     }
@@ -221,20 +209,18 @@ class Schedule extends Component {
 function validate(values) { }
 
 function mapStateToProps(state, ownProps) {
-    //console.log (getFormValues('frmSchedule')(state) );
-    // const formValues = getFormValues('frmSchedule')(state) || {
-    //     principle: +500,
-    //     rate: +25,
-    //     range: +12
-    // }
-    //console.log('formvalues: ', formValues);
     return {
-        state
+        state,
+        initialValues: {
+            amt: 2000,
+            rate: 10,
+            range: 12,
+        }
     };
 }
 
 
-export default connect(mapStateToProps, { getSchedule })(
+export default connect(mapStateToProps, { getSchedule, selectSchedule })(
     reduxForm({
         form: 'frmSchedule',
         enableReinitialize: true,
