@@ -111,7 +111,7 @@ exports.parseNumberArray = function(arr) {
 };
 
 exports.parseMatrix = function(matrix) {
-  var n;
+  var n; 
   if (!matrix || (n = matrix.length) === 0) {
     return error.value;
   }

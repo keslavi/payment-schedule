@@ -132,7 +132,7 @@ class Schedule extends Component {
                 <CardBody>
                     <h5>Selected Plan:</h5>
                     <br /><b>${item.amt.toMoney()}</b> borrowed at <b>{item.rate.apr}</b>
-                    <br />for <b>{item.rate.time}</b> Months, with a monthly payment
+                    <br />for <b>{item.time}</b> Months, with a monthly payment
                     <br />of <b>${item.payment}</b> per month
                 </CardBody>
             </Card>
@@ -179,7 +179,7 @@ class Schedule extends Component {
                                 />
                                 <Col>
                                     <FormGroup className='submit'>
-                                        <Label>&nbsp;.</Label>
+                                        <Label>&nbsp;</Label>
                                         <div>
                                             <Button color='primary no-print'>Submit</Button>
                                         </div>
