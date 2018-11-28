@@ -93,7 +93,7 @@ import { CUMIPMT, CUMPRINC } from './financial';
     for (let t = 1; t <= m.range; t++) {
       let paymentDet=pmt(r,t,p);
       if (t>12) {
-        paymentDet.payment = p12;
+        paymentDet.payment = p12.toMoney();
         paymentDet.payment2 = (-CUMPRINC(m.rate/100,t,m.amt,13,t,0)/(t+1-13)).toMoney();
       }
       m.schedules.push(paymentDet);

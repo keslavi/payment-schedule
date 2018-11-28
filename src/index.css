@@ -1,3 +1,13 @@
+@media print {
+  size: auto;   /* auto is the initial value */
+  margin: 0;  /* this affects the margin in the printer settings */
+}
+
+@page {
+  size: auto;   /* auto is the initial value */
+  margin: 0;  /* this affects the margin in the printer settings */
+
+}
 body {
   margin: 0;
   padding: 0;
